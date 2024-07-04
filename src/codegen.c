@@ -22,20 +22,36 @@ void generate(Node *root)
                         printf("Broke from codegen loop");
                         break;
                 }
-                if (child->type == DECLARATION)
+                if (child->type == DECLARATION_NODE)
                 {
+
+                        // Add condition to check what kind of literal is it ,  int bool etc (for future additions)
                         printf("%s %s = %s;\n", "int", child->value, child->children[0]->value);
                         fprintf(output, "%s %s = %s;\n", "int", child->value, child->children[0]->value);
                 }
-                else if (child->type == ASSIGNMENT)
+                else if (child->type == ASSIGNMENT_NODE)
                 {
-                        printf("%s = %s;\n", child->value, child->children[0]->value);
                         fprintf(output, "%s = %s;\n", child->value, child->children[0]->value);
                 }
-                else if (child->type == PRINT_STATEMENT)
+                else if (child->type == PRINT_STATEMENT_NODE)
                 {
-                        printf("printf(\"%%d\\n\", %s);\n", child->children[0]->value);
                         fprintf(output, "printf(\"%%d\\n\", %s);\n", child->children[0]->value);
+                }
+                else if (child->type == DECLARATION_ASSIGNMENT_NODE)
+                {
+                        // Add condition to check what kind of literal is it ,  int bool etc (for future additions)
+                        if (child->children[0]->type == BIN_OP_NODE)
+                        {
+                                //  Add code for if there are more than two operands
+                                Node *operator= child->children[0];
+                                Node *left_operand = operator->children[0];
+                                Node *right_operand = operator->children[1];
+                                fprintf(output, "%s %s =%s %s %s;\n", "int", child->value, left_operand->value, operator->value, right_operand->value);
+                        }
+                        else
+                        {
+                                fprintf(output, "%s %s = %s;\n", "int", child->value, child->children[0]->value);
+                        }
                 }
         }
         fprintf(output, "return 0;\n}");
