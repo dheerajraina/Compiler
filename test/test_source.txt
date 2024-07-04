@@ -1,2 +1,2 @@
-int age:=25
+int age:=10+5
 print(age)
