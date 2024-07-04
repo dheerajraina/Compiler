@@ -3,16 +3,17 @@
 
 typedef enum
 {
-        INT,
-        IDENTIFIER,
-        ASSIGN,
-        COLON,
-        SEMICOLON,
-        PRINT,
-        LPAREN,
-        RPAREN,
-        LITERAL_INT,
-        END_OF_FILE
+        INT_TOKEN,
+        IDENTIFIER_TOKEN,
+        ASSIGN_TOKEN,
+        COLON_TOKEN,
+        SEMICOLON_TOKEN,
+        PRINT_TOKEN,
+        LPAREN_TOKEN,
+        RPAREN_TOKEN,
+        LITERAL_INT_TOKEN,
+        PLUS_TOKEN,
+        END_OF_FILE_TOKEN,
 } TokenType;
 
 typedef struct
