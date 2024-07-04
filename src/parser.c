@@ -39,17 +39,17 @@ Node *parseToken(Parser *parser)
                 printf("Entered parse token \n");
                 Token token = parser->tokens[parser->pos];
                 printf("%d,%d \n\n", token.type, parser->tokens[parser->pos + 1].type);
-                if (token.type == INT)
+                if (token.type == INT_TOKEN)
                 {
                         printf("Entered parse token INT\n\n");
                         return parseDeclaration(parser);
                 }
-                else if (token.type == IDENTIFIER && parser->tokens[parser->pos + 1].type == ASSIGN)
+                else if (token.type == IDENTIFIER_TOKEN && parser->tokens[parser->pos + 1].type == ASSIGN_TOKEN)
                 {
                         printf("Entered parse token IDENTIFIER\n\n");
                         return parseAssignment(parser);
                 }
-                else if (token.type == PRINT)
+                else if (token.type == PRINT_TOKEN)
                 {
                         printf("Entered parse token PRINT\n\n");
                         return parsePrintStatement(parser);
@@ -65,35 +65,61 @@ Node *parseDeclaration(Parser *parser)
 
         parser->pos++; // Skip 'int' or 'integer'
 
-        if (parser->tokens[parser->pos].type == IDENTIFIER)
+        if (parser->tokens[parser->pos].type == IDENTIFIER_TOKEN)
         {
                 printf("inside declaration %s\n\n", parser->tokens[parser->pos].value);
                 char *identifier = parser->tokens[parser->pos++].value;
-                Node *node = createNode(DECLARATION, identifier);
-                // node->children[0] = createNode(IDENTIFIER, identifier);
-                if (parser->tokens[parser->pos].type == ASSIGN)
+                if (parser->tokens[parser->pos].type != ASSIGN_TOKEN)
                 {
+                        Node *node = createNode(DECLARATION_NODE, identifier);
+                        return node;
+                }
+                else
+                {
+                        Node *node = createNode(DECLARATION_ASSIGNMENT_NODE, identifier);
                         parser->pos++; // Skip ':='
-                        if (parser->tokens[parser->pos].type == LITERAL_INT)
+                        if (parser->tokens[parser->pos].type == LITERAL_INT_TOKEN)
                         {
-                                node->children[0] = createNode(LITERAL, parser->tokens[parser->pos++].value);
+                                if (parser->tokens[parser->pos + 1].type != PLUS_TOKEN)
+                                        node->children[0] = createNode(LITERAL_NODE, parser->tokens[parser->pos++].value);
+                                else
+                                {
+                                        printf("bin op encountered\n\n");
+                                        Node *left = createNode(LITERAL_NODE, parser->tokens[parser->pos++].value);
+                                        printf("left value %s\n\n", left->value);
+                                        while (parser->tokens[parser->pos].type == PLUS_TOKEN)
+                                        {
+                                                Token operator= parser->tokens[parser->pos++];
+                                                Token next_token = parser->tokens[parser->pos++];
+                                                Node *right = createNode(LITERAL_NODE, next_token.value);
+                                                Node *bin_op_node = createNode(BIN_OP_NODE, operator.value);
+                                                printf("right value %s\n\n", next_token.value);
+                                                printf("op value %s\n\n", operator.value);
+                                                // node->children[0] = bin_op_node;
+                                                bin_op_node->children[0] = left;
+                                                bin_op_node->children[1] = right;
+                                                // node->children[1] = right;
+                                                left = bin_op_node;
+                                                printf("Index value %s\n\n", parser->tokens[parser->pos].value);
+                                        }
+                                        node->children[0] = left;
+                                }
+
+                                return node;
                         }
                 }
-
-                return node;
         }
-
         return NULL;
 }
 
 Node *parseAssignment(Parser *parser)
 {
-        Node *node = createNode(ASSIGNMENT, parser->tokens[parser->pos++].value);
+        Node *node = createNode(ASSIGNMENT_NODE, parser->tokens[parser->pos++].value);
         parser->pos++; // Skip ':='
 
-        if (parser->tokens[parser->pos].type == LITERAL_INT)
+        if (parser->tokens[parser->pos].type == LITERAL_INT_TOKEN)
         {
-                node->children[0] = createNode(LITERAL, parser->tokens[parser->pos++].value);
+                node->children[0] = createNode(LITERAL_NODE, parser->tokens[parser->pos++].value);
         }
 
         return node;
@@ -103,17 +129,17 @@ Node *parsePrintStatement(Parser *parser)
 {
         parser->pos++; // Skip 'print'
 
-        if (parser->tokens[parser->pos].type == LPAREN)
+        if (parser->tokens[parser->pos].type == LPAREN_TOKEN)
         {
                 parser->pos++; // Skip '('
         }
 
-        if (parser->tokens[parser->pos].type == IDENTIFIER)
+        if (parser->tokens[parser->pos].type == IDENTIFIER_TOKEN)
         {
-                Node *node = createNode(PRINT_STATEMENT, "print");
-                node->children[0] = createNode(IDENTIFIER, parser->tokens[parser->pos++].value);
+                Node *node = createNode(PRINT_STATEMENT_NODE, "print");
+                node->children[0] = createNode(IDENTIFIER_NODE, parser->tokens[parser->pos++].value);
 
-                if (parser->tokens[parser->pos].type == RPAREN)
+                if (parser->tokens[parser->pos].type == RPAREN_TOKEN)
                 {
                         parser->pos++; // Skip ')'
                 }
@@ -131,7 +157,7 @@ Node *parse(TokenList *tokenList)
         parser.pos = 0;
         parser.size = tokenList->size;
 
-        Node *root = createNode(DECLARATION, "root");
+        Node *root = createNode(PROGRAM_NODE, "root");
 
         size_t childIndex = 0;
 
@@ -141,7 +167,10 @@ Node *parse(TokenList *tokenList)
                 Node *child = parseToken(&parser);
                 if (child)
                 {
+                        printf("\n\n----------node value %s\n\n", child->value);
+
                         root->children[childIndex++] = child;
+                        printf("root %s\n\n", root->children[childIndex - 1]->value);
                 }
                 else
                 {
