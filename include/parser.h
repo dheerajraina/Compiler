@@ -5,10 +5,16 @@
 
 typedef enum
 {
-        DECLARATION,
-        ASSIGNMENT,
-        PRINT_STATEMENT,
-        LITERAL
+        PROGRAM_NODE,
+        DECLARATION_NODE,
+        ASSIGNMENT_NODE,
+        PRINT_STATEMENT_NODE,
+        LITERAL_NODE,
+        EXPRESSION_NODE,
+        BIN_OP_NODE,
+        DECLARATION_ASSIGNMENT_NODE,
+        IDENTIFIER_NODE,
+
 } NodeType;
 
 typedef struct Node
