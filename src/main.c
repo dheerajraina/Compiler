@@ -38,25 +38,27 @@ const char *tokenTypeToString(TokenType type)
 {
         switch (type)
         {
-        case INT:
+        case INT_TOKEN:
                 return "INT";
-        case IDENTIFIER:
+        case IDENTIFIER_TOKEN:
                 return "IDENTIFIER";
-        case ASSIGN:
+        case ASSIGN_TOKEN:
                 return "ASSIGN";
-        case COLON:
+        case COLON_TOKEN:
                 return "COLON";
-        case SEMICOLON:
+        case SEMICOLON_TOKEN:
                 return "SEMICOLON";
-        case PRINT:
+        case PRINT_TOKEN:
                 return "PRINT";
-        case LPAREN:
+        case LPAREN_TOKEN:
                 return "LPAREN";
-        case RPAREN:
+        case RPAREN_TOKEN:
                 return "RPAREN";
-        case LITERAL_INT:
+        case LITERAL_INT_TOKEN:
                 return "LITERAL_INT";
-        case END_OF_FILE:
+        case PLUS_TOKEN:
+                return "PLUS";
+        case END_OF_FILE_TOKEN:
                 return "END_OF_FILE";
         default:
                 return "UNKNOWN_TYPE";
@@ -101,7 +103,7 @@ int main()
 
         analyze(syntaxTree);
         generate(syntaxTree);
-        printf("\n\n\n\n");
+        // printf("\n\n\n\n");
         printf("Final Source Code Run\n");
         run();
 
