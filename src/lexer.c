@@ -37,7 +37,7 @@ TokenList tokenize(const char *source)
                         const char *start = ptr;
                         while (isdigit(*ptr))
                                 ptr++;
-                        addToken(&list, LITERAL_INT, strndup(start, ptr - start));
+                        addToken(&list, LITERAL_INT_TOKEN, strndup(start, ptr - start));
                 }
                 else if (isalpha(*ptr))
                 {
@@ -47,15 +47,15 @@ TokenList tokenize(const char *source)
                         char *word = strndup(start, ptr - start);
                         if (strcmp(word, "int") == 0 || strcmp(word, "integer") == 0)
                         {
-                                addToken(&list, INT, word);
+                                addToken(&list, INT_TOKEN, word);
                         }
                         else if (strcmp(word, "print") == 0)
                         {
-                                addToken(&list, PRINT, word);
+                                addToken(&list, PRINT_TOKEN, word);
                         }
                         else
                         {
-                                addToken(&list, IDENTIFIER, word);
+                                addToken(&list, IDENTIFIER_TOKEN, word);
                         }
                         free(word);
                 }
@@ -66,23 +66,27 @@ TokenList tokenize(const char *source)
                         case ':':
                                 if (*(ptr + 1) == '=')
                                 {
-                                        addToken(&list, ASSIGN, ":=");
+                                        addToken(&list, ASSIGN_TOKEN, ":=");
                                         ptr++;
                                 }
                                 else
                                 {
-                                        addToken(&list, COLON, ":");
+                                        addToken(&list, COLON_TOKEN, ":");
                                 }
                                 break;
                         case ';':
-                                addToken(&list, SEMICOLON, ";");
+                                addToken(&list, SEMICOLON_TOKEN, ";");
                                 break;
                         case '(':
-                                addToken(&list, LPAREN, "(");
+                                addToken(&list, LPAREN_TOKEN, "(");
                                 break;
                         case ')':
-                                addToken(&list, RPAREN, ")");
+                                addToken(&list, RPAREN_TOKEN, ")");
                                 break;
+                        case '+':
+                                addToken(&list, PLUS_TOKEN, "+");
+                                break;
+
                         default:
                                 ptr++;
                                 break;
@@ -90,6 +94,6 @@ TokenList tokenize(const char *source)
                         ptr++;
                 }
         }
-        addToken(&list, END_OF_FILE, "");
+        addToken(&list, END_OF_FILE_TOKEN, "");
         return list;
 }
