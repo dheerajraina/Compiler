@@ -44,6 +44,23 @@ void checkDeclaration(Node *node)
         addSymbol(node->value, node->children[0]->type);
 }
 
+void checkDeclarationAssignment(Node *node)
+{
+        printf("Checking declaration and assignment: %s\n", node->value);
+        if (getSymbolType(node->value) != -1)
+        {
+                printf("Semantic error: Redeclaration of variable '%s'\n", node->value);
+                exit(EXIT_FAILURE);
+        }
+        addSymbol(node->value, node->children[0]->type);
+
+        if (node->children[0]->type == BIN_OP_NODE)
+                checkBinaryOperation(node->children[0]);
+        else if (node->children[0]->type == LITERAL_NODE)
+                checkAssignment(node);
+        else
+                exit(EXIT_FAILURE);
+}
 void checkAssignment(Node *node)
 {
         printf("Checking assignment to: %s\n", node->value);
@@ -64,10 +81,38 @@ void checkAssignment(Node *node)
         }
 }
 
+void checkBinaryOperation(Node *node)
+{
+        if (strcmp(node->value, "+") == 0)
+        {
+
+                analyzeNode(node->children[0]);
+                analyzeNode(node->children[1]);
+                TokenType leftType = getSymbolType(node->children[0]->value);
+                TokenType rightType = getSymbolType(node->children[1]->value);
+
+                if (node->children[0]->type == LITERAL_NODE)
+                {
+                        leftType = LITERAL_INT_TOKEN; // Assuming literals are integers for simplicity
+                }
+
+                if (node->children[1]->type == LITERAL_NODE)
+                {
+                        rightType = LITERAL_INT_TOKEN; // Assuming literals are integers for simplicity
+                }
+
+                if (leftType != rightType)
+                {
+                        fprintf(stderr, "Error: Type mismatch in binary operation. Left type: %d, Right type: %d\n", leftType, rightType);
+                        exit(EXIT_FAILURE);
+                }
+        }
+}
 void checkPrintStatement(Node *node)
 {
         printf("Checking print statement for variable: %s\n", node->children[0]->value);
         NodeType varType = getSymbolType(node->children[0]->value);
+        printf(" print node %s %d", node->children[0]->value, node->children[0]->type);
         if (varType == -1)
         {
                 printf("Semantic error: Undeclared variable '%s'\n", node->children[0]->value);
@@ -82,15 +127,21 @@ void analyzeNode(Node *node)
 
         switch (node->type)
         {
-        case DECLARATION:
+        case DECLARATION_NODE:
                 checkDeclaration(node);
                 break;
-        case ASSIGNMENT:
+        case ASSIGNMENT_NODE:
                 checkAssignment(node);
                 break;
-        case PRINT_STATEMENT:
+        case PRINT_STATEMENT_NODE:
 
                 checkPrintStatement(node);
+                break;
+        case BIN_OP_NODE:
+                checkBinaryOperation(node);
+                break;
+        case DECLARATION_ASSIGNMENT_NODE:
+                checkDeclarationAssignment(node);
                 break;
         default:
                 break;
