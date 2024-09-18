@@ -21,9 +21,15 @@ typedef struct Node
 {
         NodeType type;
         char value[100];
-        struct Node *children[2];
+        struct Node **children;
+        int numChildren;
+        int capacity;
 } Node;
 
 Node *parse(TokenList *tokenList);
+Node *createNode(NodeType type, const char *value);
+void addChild(Node *parent, Node *child);
+void expandNodeChildren(Node *node);
+void freeNode(Node *node);
 
 #endif
