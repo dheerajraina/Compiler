@@ -14,7 +14,7 @@ void generate(Node *root)
         printf("Generated Code:\n");
         fprintf(output, "#include<stdio.h>\n");
         fprintf(output, "int main(){\n");
-        for (int i = 0; i < 2 && root->children[i] != NULL; i++)
+        for (int i = 0; i < root->numChildren && root->children[i] != NULL; i++)
         {
                 Node *child = root->children[i];
                 if (child == NULL)
