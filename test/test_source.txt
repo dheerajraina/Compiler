@@ -1,2 +1,5 @@
-int age:=10+5
-print(age)
+int  age1 := 60 + 6
+print(age1)
+
+int temp1 := 90 + 10
+print(temp1)
