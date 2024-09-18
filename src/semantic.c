@@ -42,6 +42,10 @@ void checkDeclaration(Node *node)
                 exit(EXIT_FAILURE);
         }
         addSymbol(node->value, node->children[0]->type);
+        for (int i = 0; i < node->numChildren; i++)
+        {
+                analyzeNode(node->children[i]);
+        }
 }
 
 void checkDeclarationAssignment(Node *node)
@@ -53,6 +57,10 @@ void checkDeclarationAssignment(Node *node)
                 exit(EXIT_FAILURE);
         }
         addSymbol(node->value, node->children[0]->type);
+        for (int i = 0; i < node->numChildren; i++)
+        {
+                analyzeNode(node->children[i]);
+        }
 
         if (node->children[0]->type == BIN_OP_NODE)
                 checkBinaryOperation(node->children[0]);
@@ -69,6 +77,11 @@ void checkAssignment(Node *node)
         {
                 printf("Semantic error: Undeclared variable '%s'\n", node->value);
                 exit(EXIT_FAILURE);
+        }
+
+        for (int i = 0; i < node->numChildren; i++)
+        {
+                analyzeNode(node->children[i]);
         }
         if (node->children[0] != NULL)
         {
@@ -112,7 +125,7 @@ void checkPrintStatement(Node *node)
 {
         printf("Checking print statement for variable: %s\n", node->children[0]->value);
         NodeType varType = getSymbolType(node->children[0]->value);
-        printf(" print node %s %d", node->children[0]->value, node->children[0]->type);
+        printf(" print node %s  %d\n", node->children[0]->value, node->children[0]->type);
         if (varType == -1)
         {
                 printf("Semantic error: Undeclared variable '%s'\n", node->children[0]->value);
@@ -147,7 +160,7 @@ void analyzeNode(Node *node)
                 break;
         }
 
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < node->numChildren; i++)
         {
                 if (node->children[i] != NULL)
                 {
