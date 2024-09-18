@@ -21,13 +21,36 @@ Node *createNode(NodeType type, const char *value)
 
         node->type = type;
         strncpy(node->value, value, sizeof(node->value) - 1);
-        node->value[sizeof(node->value) - 1] = '\0';
-        node->children[0] = NULL;
-        node->children[1] = NULL;
+        node->numChildren = 0;
+        node->capacity = 2;
+        node->children = malloc(sizeof(Node *) * node->capacity);
 
         return node;
 }
 
+void addChild(Node *parent, Node *child)
+{
+        if (parent->numChildren >= parent->capacity)
+        {
+                expandNodeChildren(parent);
+        }
+        parent->children[parent->numChildren++] = child;
+}
+void expandNodeChildren(Node *node)
+{
+        node->capacity *= 2;
+        node->children = realloc(node->children, sizeof(Node *) * node->capacity);
+}
+
+void freeNode(Node *node)
+{
+        for (int i = 0; i < node->numChildren; i++)
+        {
+                freeNode(node->children[i]);
+        }
+        free(node->children);
+        free(node);
+}
 Node *parseDeclaration(Parser *parser);
 Node *parseAssignment(Parser *parser);
 Node *parsePrintStatement(Parser *parser);
@@ -81,7 +104,8 @@ Node *parseDeclaration(Parser *parser)
                         if (parser->tokens[parser->pos].type == LITERAL_INT_TOKEN)
                         {
                                 if (parser->tokens[parser->pos + 1].type != PLUS_TOKEN)
-                                        node->children[0] = createNode(LITERAL_NODE, parser->tokens[parser->pos++].value);
+
+                                        addChild(node, createNode(LITERAL_NODE, parser->tokens[parser->pos++].value));
                                 else
                                 {
                                         printf("bin op encountered\n\n");
@@ -96,13 +120,13 @@ Node *parseDeclaration(Parser *parser)
                                                 printf("right value %s\n\n", next_token.value);
                                                 printf("op value %s\n\n", operator.value);
                                                 // node->children[0] = bin_op_node;
-                                                bin_op_node->children[0] = left;
-                                                bin_op_node->children[1] = right;
-                                                // node->children[1] = right;
+                                                addChild(bin_op_node, left);
+                                                addChild(bin_op_node, right);
+
                                                 left = bin_op_node;
                                                 printf("Index value %s\n\n", parser->tokens[parser->pos].value);
                                         }
-                                        node->children[0] = left;
+                                        addChild(node, left);
                                 }
 
                                 return node;
@@ -119,7 +143,7 @@ Node *parseAssignment(Parser *parser)
 
         if (parser->tokens[parser->pos].type == LITERAL_INT_TOKEN)
         {
-                node->children[0] = createNode(LITERAL_NODE, parser->tokens[parser->pos++].value);
+                addChild(node, createNode(LITERAL_NODE, parser->tokens[parser->pos++].value));
         }
 
         return node;
@@ -137,7 +161,7 @@ Node *parsePrintStatement(Parser *parser)
         if (parser->tokens[parser->pos].type == IDENTIFIER_TOKEN)
         {
                 Node *node = createNode(PRINT_STATEMENT_NODE, "print");
-                node->children[0] = createNode(IDENTIFIER_NODE, parser->tokens[parser->pos++].value);
+                addChild(node, createNode(IDENTIFIER_NODE, parser->tokens[parser->pos++].value));
 
                 if (parser->tokens[parser->pos].type == RPAREN_TOKEN)
                 {
@@ -159,8 +183,6 @@ Node *parse(TokenList *tokenList)
 
         Node *root = createNode(PROGRAM_NODE, "root");
 
-        size_t childIndex = 0;
-
         while (parser.pos < parser.size)
         {
                 printf("parse function while %ld, %ld \n", parser.pos, parser.size);
@@ -169,8 +191,7 @@ Node *parse(TokenList *tokenList)
                 {
                         printf("\n\n----------node value %s\n\n", child->value);
 
-                        root->children[childIndex++] = child;
-                        printf("root %s\n\n", root->children[childIndex - 1]->value);
+                        addChild(root, child);
                 }
                 else
                 {
