@@ -1,6 +1,8 @@
 #include<stdio.h>
 int main(){
-int age =10 + 5;
-printf("%d\n", age);
+int age1 =60 + 6;
+printf("%d\n", age1);
+int temp1 =90 + 10;
+printf("%d\n", temp1);
 return 0;
 }
