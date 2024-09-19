@@ -5,7 +5,7 @@
 
 static SymbolTable symbolTable;
 
-void addSymbol(const char *name, NodeType type)
+void addSymbol(const char *name, NodeType type, DataType dType)
 {
         if (symbolTable.size >= SYMBOL_TABLE_SIZE)
         {
@@ -16,6 +16,7 @@ void addSymbol(const char *name, NodeType type)
         strncpy(symbolTable.symbols[symbolTable.size].name, name, MAX_SYMBOL_NAME_LENGTH - 1);
         symbolTable.symbols[symbolTable.size].name[MAX_SYMBOL_NAME_LENGTH - 1] = '\0'; // Ensure null-termination
         symbolTable.symbols[symbolTable.size].type = type;
+        symbolTable.symbols[symbolTable.size].dType = dType;
         symbolTable.size++;
 
         printf("Added symbol: %s with type: %d\n", name, type);
@@ -27,7 +28,7 @@ NodeType getSymbolType(const char *name)
         {
                 if (strcmp(symbolTable.symbols[i].name, name) == 0)
                 {
-                        return symbolTable.symbols[i].type;
+                        return symbolTable.symbols[i].dType;
                 }
         }
         return -1; // Indicates that the symbol is not found
@@ -41,7 +42,8 @@ void checkDeclaration(Node *node)
                 printf("Semantic error: Redeclaration of variable '%s'\n", node->value);
                 exit(EXIT_FAILURE);
         }
-        addSymbol(node->value, node->children[0]->type);
+
+        addSymbol(node->value, node->type, node->dType);
         for (int i = 0; i < node->numChildren; i++)
         {
                 analyzeNode(node->children[i]);
@@ -56,7 +58,7 @@ void checkDeclarationAssignment(Node *node)
                 printf("Semantic error: Redeclaration of variable '%s'\n", node->value);
                 exit(EXIT_FAILURE);
         }
-        addSymbol(node->value, node->children[0]->type);
+        addSymbol(node->value, node->children[0]->type, node->children[0]->dType);
         for (int i = 0; i < node->numChildren; i++)
         {
                 analyzeNode(node->children[i]);
@@ -72,7 +74,7 @@ void checkDeclarationAssignment(Node *node)
 void checkAssignment(Node *node)
 {
         printf("Checking assignment to: %s\n", node->value);
-        NodeType varType = getSymbolType(node->value);
+        DataType varType = getSymbolType(node->value);
         if (varType == -1)
         {
                 printf("Semantic error: Undeclared variable '%s'\n", node->value);
@@ -85,11 +87,19 @@ void checkAssignment(Node *node)
         }
         if (node->children[0] != NULL)
         {
-                NodeType valueType = node->children[0]->type;
-                if (varType != valueType)
+                if (node->children[0]->type == BIN_OP_NODE)
                 {
-                        printf("Semantic error: Type mismatch in assignment to '%s'\n", node->value);
-                        exit(EXIT_FAILURE);
+                        checkBinaryOperation(node->children[0]);
+                }
+                else
+                {
+                        DataType valueType = node->children[0]->dType;
+                        printf("-----types %d %d ", varType, valueType);
+                        if (varType != valueType)
+                        {
+                                printf("Semantic error: Type mismatch in assignment to '%s'\n", node->value);
+                                exit(EXIT_FAILURE);
+                        }
                 }
         }
 }

@@ -10,6 +10,8 @@ typedef struct
 {
         char name[MAX_SYMBOL_NAME_LENGTH];
         NodeType type;
+        DataType dType;
+        int isInitialised; // 1 ==yes ; o== no
 } Symbol;
 
 typedef struct
