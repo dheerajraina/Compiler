@@ -5,6 +5,11 @@
 
 typedef enum
 {
+        INT,
+        NONE
+} DataType;
+typedef enum
+{
         PROGRAM_NODE,
         DECLARATION_NODE,
         ASSIGNMENT_NODE,
@@ -19,6 +24,7 @@ typedef enum
 
 typedef struct Node
 {
+        DataType dType;
         NodeType type;
         char value[100];
         struct Node **children;
@@ -27,7 +33,7 @@ typedef struct Node
 } Node;
 
 Node *parse(TokenList *tokenList);
-Node *createNode(NodeType type, const char *value);
+Node *createNode(NodeType type, const char *value, const DataType dType);
 void addChild(Node *parent, Node *child);
 void expandNodeChildren(Node *node);
 void freeNode(Node *node);
