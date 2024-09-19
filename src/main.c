@@ -58,6 +58,16 @@ const char *tokenTypeToString(TokenType type)
                 return "LITERAL_INT";
         case PLUS_TOKEN:
                 return "PLUS";
+        case FOR_KEYWORD:
+                return "FOR";
+        case FROM_KEYWORD:
+                return "FROM";
+        case TO_KEYWORD:
+                return "TO";
+        case OPEN_BRACE_TOKEN:
+                return "OPEN_BRACE";
+        case CLOSE_BRACE_TOKEN:
+                return "CLOSE_BRACE";
         case END_OF_FILE_TOKEN:
                 return "END_OF_FILE";
         default:
@@ -97,15 +107,15 @@ int main()
         printf("Tokens:\n");
         printTokens(tokens);
 
-        Node *syntaxTree = parse(&tokens);
-        printf("\nAbstract Syntax Tree:\n");
-        printAST(syntaxTree, 0);
+        // Node *syntaxTree = parse(&tokens);
+        // printf("\nAbstract Syntax Tree:\n");
+        // printAST(syntaxTree, 0);
 
-        analyze(syntaxTree);
-        generate(syntaxTree);
-        // // printf("\n\n\n\n");
-        printf("Final Source Code Run\n");
-        run();
+        // analyze(syntaxTree);
+        // generate(syntaxTree);
+        // // // printf("\n\n\n\n");
+        // printf("Final Source Code Run\n");
+        // run();
 
         return EXIT_SUCCESS;
 }
