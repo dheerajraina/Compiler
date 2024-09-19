@@ -13,6 +13,11 @@ typedef enum
         RPAREN_TOKEN,
         LITERAL_INT_TOKEN,
         PLUS_TOKEN,
+        FOR_KEYWORD,
+        FROM_KEYWORD,
+        TO_KEYWORD,
+        OPEN_BRACE_TOKEN,  // {
+        CLOSE_BRACE_TOKEN, // }
         END_OF_FILE_TOKEN,
 } TokenType;
 
