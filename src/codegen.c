@@ -27,11 +27,22 @@ void generate(Node *root)
 
                         // Add condition to check what kind of literal is it ,  int bool etc (for future additions)
                         printf("%s %s = %s;\n", "int", child->value, child->children[0]->value);
-                        fprintf(output, "%s %s = %s;\n", "int", child->value, child->children[0]->value);
+                        fprintf(output, "%s %s;\n", "int", child->value);
                 }
                 else if (child->type == ASSIGNMENT_NODE)
                 {
-                        fprintf(output, "%s = %s;\n", child->value, child->children[0]->value);
+                        if (child->children[0]->type == BIN_OP_NODE)
+                        {
+                                //  Add code for if there are more than two operands
+                                Node *operator= child->children[0];
+                                Node *left_operand = operator->children[0];
+                                Node *right_operand = operator->children[1];
+                                fprintf(output, "%s =%s %s %s;\n", child->value, left_operand->value, operator->value, right_operand->value);
+                        }
+                        else
+                        {
+                                fprintf(output, "%s = %s;\n", child->value, child->children[0]->value);
+                        }
                 }
                 else if (child->type == PRINT_STATEMENT_NODE)
                 {
