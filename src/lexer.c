@@ -53,6 +53,18 @@ TokenList tokenize(const char *source)
                         {
                                 addToken(&list, PRINT_TOKEN, word);
                         }
+                        else if (strcmp(word, "for") == 0)
+                        {
+                                addToken(&list, FOR_KEYWORD, word);
+                        }
+                        else if (strcmp(word, "from") == 0)
+                        {
+                                addToken(&list, FROM_KEYWORD, word);
+                        }
+                        else if (strcmp(word, "to") == 0)
+                        {
+                                addToken(&list, TO_KEYWORD, word);
+                        }
                         else
                         {
                                 addToken(&list, IDENTIFIER_TOKEN, word);
@@ -82,6 +94,12 @@ TokenList tokenize(const char *source)
                                 break;
                         case ')':
                                 addToken(&list, RPAREN_TOKEN, ")");
+                                break;
+                        case '{':
+                                addToken(&list, OPEN_BRACE_TOKEN, "{");
+                                break;
+                        case '}':
+                                addToken(&list, CLOSE_BRACE_TOKEN, "}");
                                 break;
                         case '+':
                                 addToken(&list, PLUS_TOKEN, "+");
