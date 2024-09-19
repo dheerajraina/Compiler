@@ -1,5 +1,8 @@
-int  age1 := 60 + 6
+int  age1
+age1 := 60 + 100
 print(age1)
 
 int temp1 := 90 + 10
 print(temp1)
+
+int i

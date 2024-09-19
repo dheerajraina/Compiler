@@ -78,7 +78,7 @@ void printAST(Node *node, int level)
                 return;
 
         // Print current node
-        printf("%*sNode Type: %d, Value: %s\n", level * 2, "", node->type, node->value);
+        printf("%*sNode Type: %d, Value: %s ,Data Type: %d\n", level * 2, "", node->type, node->value, node->dType);
 
         // Recursively print children
         for (int i = 0; i < node->numChildren; i++)
@@ -103,7 +103,7 @@ int main()
 
         analyze(syntaxTree);
         generate(syntaxTree);
-        printf("\n\n\n\n");
+        // // printf("\n\n\n\n");
         printf("Final Source Code Run\n");
         run();
 
