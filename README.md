@@ -1,15 +1,18 @@
-# Implementation of a Compiler from scratch for a custom language in C
+# Implementation of a Compiler from scratch for a custom language(DhLang) in C
 
 **Current Progress :-**
 
-int a := 5</br>
-print(a)
+int  age</br> 
+age := 60</br> 
+print(age)
 
-int a := 10+5 </br>
-print(a)
+int temp := 90 + 10</br>
+print(temp)
+
+
+
 
 ### Project setup (Ubuntu)
-## Setup (for Ubuntu)
 - Clone and enter the repository directory
   ```
   git clone repository_url
