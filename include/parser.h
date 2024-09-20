@@ -19,6 +19,8 @@ typedef enum
         BIN_OP_NODE,
         DECLARATION_ASSIGNMENT_NODE,
         IDENTIFIER_NODE,
+        FOR_LOOP_NODE,
+        LOOP_BODY_NODE,
 
 } NodeType;
 
