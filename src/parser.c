@@ -55,6 +55,7 @@ void freeNode(Node *node)
 Node *parseDeclaration(Parser *parser);
 Node *parseAssignment(Parser *parser);
 Node *parsePrintStatement(Parser *parser);
+Node *parseForLoop(Parser *parser);
 
 Node *parseToken(Parser *parser)
 {
@@ -77,6 +78,11 @@ Node *parseToken(Parser *parser)
                 {
                         printf("Entered parse token PRINT\n\n");
                         return parsePrintStatement(parser);
+                }
+                else if (token.type == FOR_KEYWORD)
+                {
+                        printf("-----------FOR KEYWORD");
+                        return parseForLoop(parser);
                 }
         }
         return NULL;
@@ -196,6 +202,52 @@ Node *parsePrintStatement(Parser *parser)
                 }
 
                 return node;
+        }
+
+        return NULL;
+}
+
+Node *parseForLoop(Parser *parser)
+{
+
+        Node *forNode = createNode(FOR_LOOP_NODE, "for", NONE);
+        Node *variable;
+        Node *rangeStart;
+        Node *rangeEnd;
+        parser->pos++; // Skip for
+        if (parser->tokens[parser->pos].type == IDENTIFIER_TOKEN)
+        {
+                printf("\n\n1\n");
+                char *identifier = parser->tokens[parser->pos++].value;
+                variable = createNode(DECLARATION_NODE, identifier, INT);
+                addChild(forNode, variable);
+        }
+        printf("----- next token %d", parser->tokens[parser->pos].type);
+
+        if (parser->tokens[parser->pos++].type == FROM_KEYWORD && parser->tokens[parser->pos].type == LITERAL_INT_TOKEN)
+        {
+                printf("\n\n2\n\n");
+                rangeStart = createNode(LITERAL_NODE, parser->tokens[parser->pos++].value, INT);
+                addChild(variable, rangeStart);
+        }
+        if (parser->tokens[parser->pos++].type == TO_KEYWORD && parser->tokens[parser->pos].type == LITERAL_INT_TOKEN)
+        {
+                printf("3");
+                rangeEnd = createNode(LITERAL_NODE, parser->tokens[parser->pos++].value, INT);
+                addChild(variable, rangeEnd);
+        }
+
+        if (parser->tokens[parser->pos].type == OPEN_BRACE_TOKEN)
+        {
+                while (parser->tokens[parser->pos].type != CLOSE_BRACE_TOKEN)
+                {
+                        parser->pos++;
+                }
+        }
+
+        if (parser->tokens[parser->pos].type == CLOSE_BRACE_TOKEN)
+        {
+                return forNode;
         }
 
         return NULL;
