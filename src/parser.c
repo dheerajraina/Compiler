@@ -215,42 +215,49 @@ Node *parseForLoop(Parser *parser)
         Node *rangeStart;
         Node *rangeEnd;
         parser->pos++; // Skip for
-        if (parser->tokens[parser->pos].type == IDENTIFIER_TOKEN)
+        if (parser->tokens[parser->pos].type != IDENTIFIER_TOKEN)
         {
-                printf("\n\n1\n");
-                char *identifier = parser->tokens[parser->pos++].value;
-                variable = createNode(DECLARATION_NODE, identifier, INT);
-                addChild(forNode, variable);
+                printf("Syntax error: Unexpected token '%s'\n ", parser->tokens[parser->pos].value);
+                exit(EXIT_FAILURE);
         }
-        printf("----- next token %d", parser->tokens[parser->pos].type);
+        printf("\n\n1\n");
+        char *identifier = parser->tokens[parser->pos++].value;
+        variable = createNode(DECLARATION_NODE, identifier, INT);
+        addChild(forNode, variable);
+        if (parser->tokens[parser->pos++].type != FROM_KEYWORD || parser->tokens[parser->pos].type != LITERAL_INT_TOKEN)
+        {
+                printf("Syntax error: Unexpected token '%s'\n ", parser->tokens[parser->pos].value);
+                exit(EXIT_FAILURE);
+        }
+        printf("\n\n2\n\n");
+        rangeStart = createNode(FROM_EXPR_NODE, parser->tokens[parser->pos++].value, INT);
+        addChild(variable, rangeStart);
+        if (parser->tokens[parser->pos++].type != TO_KEYWORD || parser->tokens[parser->pos].type != LITERAL_INT_TOKEN)
+        {
+                printf("Syntax error: Unexpected token '%s'\n ", parser->tokens[parser->pos].value);
+                exit(EXIT_FAILURE);
+        }
+        printf("3");
+        rangeEnd = createNode(TO_EXPR_NODE, parser->tokens[parser->pos++].value, INT);
+        addChild(variable, rangeEnd);
 
-        if (parser->tokens[parser->pos++].type == FROM_KEYWORD && parser->tokens[parser->pos].type == LITERAL_INT_TOKEN)
+        if (parser->tokens[parser->pos].type != OPEN_BRACE_TOKEN)
         {
-                printf("\n\n2\n\n");
-                rangeStart = createNode(LITERAL_NODE, parser->tokens[parser->pos++].value, INT);
-                addChild(variable, rangeStart);
+                printf("Syntax error: Unexpected token '%s'\n ", parser->tokens[parser->pos].value);
+                exit(EXIT_FAILURE);
         }
-        if (parser->tokens[parser->pos++].type == TO_KEYWORD && parser->tokens[parser->pos].type == LITERAL_INT_TOKEN)
+        while (parser->tokens[parser->pos].type != CLOSE_BRACE_TOKEN)
         {
-                printf("3");
-                rangeEnd = createNode(LITERAL_NODE, parser->tokens[parser->pos++].value, INT);
-                addChild(variable, rangeEnd);
+                parser->pos++;
         }
 
-        if (parser->tokens[parser->pos].type == OPEN_BRACE_TOKEN)
+        if (parser->tokens[parser->pos].type != CLOSE_BRACE_TOKEN)
         {
-                while (parser->tokens[parser->pos].type != CLOSE_BRACE_TOKEN)
-                {
-                        parser->pos++;
-                }
+                printf("Syntax error: Unexpected token '%s'\n ", parser->tokens[parser->pos].value);
+                exit(EXIT_FAILURE);
         }
 
-        if (parser->tokens[parser->pos].type == CLOSE_BRACE_TOKEN)
-        {
-                return forNode;
-        }
-
-        return NULL;
+        return forNode;
 }
 
 Node *parse(TokenList *tokenList)
