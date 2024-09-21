@@ -143,6 +143,29 @@ void checkPrintStatement(Node *node)
         }
 }
 
+void checkForLoop(Node *node)
+{
+        if (node->numChildren != 1) // FOR LOOP NODE TO HAVE 2 CHILDREN -> DECLARED VARIABLE WITH ITS RANGE AS CHILDREN AND OTHER CONTAINING LOOP BODY
+        {
+                fprintf(stderr, "Error: Invalid for loop structure");
+                exit(EXIT_FAILURE);
+        }
+        Node *initNode = node->children[0]; // variable declaration
+        if (initNode->numChildren != 2)
+        {
+                fprintf(stderr, "Error: Invalid for loop structure");
+                exit(EXIT_FAILURE);
+        }
+        Node *fromExpr = initNode->children[0];
+        Node *toExpr = initNode->children[1];
+
+        if (initNode->dType != fromExpr->dType || initNode->dType != toExpr->dType)
+        {
+                fprintf(stderr, "Semantic error: Type mismatch in assignment to '%s in for loop'\n", initNode->value);
+                exit(EXIT_FAILURE);
+        }
+}
+
 void analyzeNode(Node *node)
 {
         if (node == NULL)
@@ -165,6 +188,9 @@ void analyzeNode(Node *node)
                 break;
         case DECLARATION_ASSIGNMENT_NODE:
                 checkDeclarationAssignment(node);
+                break;
+        case FOR_LOOP_NODE:
+                checkForLoop(node);
                 break;
         default:
                 break;
