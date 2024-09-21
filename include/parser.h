@@ -20,6 +20,8 @@ typedef enum
         DECLARATION_ASSIGNMENT_NODE,
         IDENTIFIER_NODE,
         FOR_LOOP_NODE,
+        FROM_EXPR_NODE,
+        TO_EXPR_NODE,
         LOOP_BODY_NODE,
 
 } NodeType;
