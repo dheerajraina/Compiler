@@ -64,6 +64,13 @@ void generate(Node *root)
                                 fprintf(output, "%s %s = %s;\n", "int", child->value, child->children[0]->value);
                         }
                 }
+                else if (child->type == FOR_LOOP_NODE)
+                {
+                        Node *init = child->children[0];
+                        Node *fromExpr = init->children[0];
+                        Node *toExpr = init->children[1];
+                        fprintf(output, "for (int %s=%s;%s<%s;%s++){printf(\"Hello\\n\");}\n", init->value, fromExpr->value, init->value, toExpr->value, init->value, "Hello");
+                }
         }
         fprintf(output, "return 0;\n}");
         fflush(output); // Ensure the data is written to disk
