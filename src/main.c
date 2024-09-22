@@ -107,15 +107,15 @@ int main()
         printf("Tokens:\n");
         printTokens(tokens);
 
-        // Node *syntaxTree = parse(&tokens);
-        // printf("\nAbstract Syntax Tree:\n");
-        // printAST(syntaxTree, 0);
+        Node *syntaxTree = parse(&tokens);
+        printf("\nAbstract Syntax Tree:\n");
+        printAST(syntaxTree, 0);
 
-        // analyze(syntaxTree);
-        // generate(syntaxTree);
-        // // // printf("\n\n\n\n");
-        // printf("Final Source Code Run\n");
-        // run();
+        analyze(syntaxTree);
+        codeGenerator(syntaxTree);
+        printf("\n\n\n\n");
+        printf("Final Source Code Run\n");
+        run();
 
         return EXIT_SUCCESS;
 }

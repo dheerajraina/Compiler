@@ -1,8 +1,11 @@
-int  age1
-age1 := 60 + 100
-print(age1)
+int  age
+age := 60
+print(age)
 
-int temp1 := 90 + 10
-print(temp1)
+int temp := 90 + 10
+print(temp)
 
-int i
+for i from 0 to 10 {
+        int number := 10
+        print(number)
+}

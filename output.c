@@ -1,10 +1,12 @@
 #include<stdio.h>
 int main(){
-int age1;
-age1 =60 + 100;
-printf("%d\n", age1);
-int temp1 =90 + 10;
-printf("%d\n", temp1);
-int i;
-return 0;
+int age;
+age = 60;
+printf("%d\n", age);
+int temp =90 + 10;
+printf("%d\n", temp);
+for (int i=0;i<10;i++){
+int number = 10;
+printf("%d\n", number);
+}return 0;
 }
