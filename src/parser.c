@@ -241,20 +241,29 @@ Node *parseForLoop(Parser *parser)
         rangeEnd = createNode(TO_EXPR_NODE, parser->tokens[parser->pos++].value, INT);
         addChild(variable, rangeEnd);
 
-        if (parser->tokens[parser->pos].type != OPEN_BRACE_TOKEN)
+        if (parser->tokens[parser->pos++].type != OPEN_BRACE_TOKEN)
         {
                 printf("Syntax error: Unexpected token '%s'\n ", parser->tokens[parser->pos].value);
                 exit(EXIT_FAILURE);
         }
+        Node *loopBody = createNode(LOOP_BODY_NODE, "loop_body", NONE); // subtree representing body of for loop
+
         while (parser->tokens[parser->pos].type != CLOSE_BRACE_TOKEN)
         {
-                parser->pos++;
+                // printf("\nEntered for loop body -> %d\n", parser->tokens[parser->pos].type);
+
+                addChild(loopBody, parseToken(parser));
+                // parser->pos++;
         }
 
         if (parser->tokens[parser->pos].type != CLOSE_BRACE_TOKEN)
         {
                 printf("Syntax error: Unexpected token '%s'\n ", parser->tokens[parser->pos].value);
                 exit(EXIT_FAILURE);
+        }
+        if (loopBody)
+        {
+                addChild(forNode, loopBody);
         }
 
         return forNode;
