@@ -3,6 +3,6 @@
 
 #include "parser.h"
 
-void generate(Node *root);
+void codeGenerator(Node *root);
 
 #endif
