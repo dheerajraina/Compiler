@@ -3,17 +3,9 @@
 #include <string.h>
 #include "codegen.h"
 
-void generate(Node *root)
+void generate(Node *root, FILE *output)
 {
-        FILE *output = fopen("output.c", "w");
-        if (output == NULL)
-        {
-                fprintf(stderr, "Failed to open output file\n");
-                exit(EXIT_FAILURE);
-        }
-        printf("Generated Code:\n");
-        fprintf(output, "#include<stdio.h>\n");
-        fprintf(output, "int main(){\n");
+
         for (int i = 0; i < root->numChildren && root->children[i] != NULL; i++)
         {
                 Node *child = root->children[i];
@@ -24,13 +16,12 @@ void generate(Node *root)
                 }
                 if (child->type == DECLARATION_NODE)
                 {
-
                         // Add condition to check what kind of literal is it ,  int bool etc (for future additions)
-                        printf("%s %s = %s;\n", "int", child->value, child->children[0]->value);
                         fprintf(output, "%s %s;\n", "int", child->value);
                 }
                 else if (child->type == ASSIGNMENT_NODE)
                 {
+
                         if (child->children[0]->type == BIN_OP_NODE)
                         {
                                 //  Add code for if there are more than two operands
@@ -69,9 +60,26 @@ void generate(Node *root)
                         Node *init = child->children[0];
                         Node *fromExpr = init->children[0];
                         Node *toExpr = init->children[1];
-                        fprintf(output, "for (int %s=%s;%s<%s;%s++){printf(\"Hello\\n\");}\n", init->value, fromExpr->value, init->value, toExpr->value, init->value, "Hello");
+                        Node *loopBody = child->children[1];
+                        fprintf(output, "for (int %s=%s;%s<%s;%s++){\n", init->value, fromExpr->value, init->value, toExpr->value, init->value);
+                        generate(loopBody, output);
+                        fprintf(output, "}");
                 }
         }
+}
+
+void codeGenerator(Node *root)
+{
+        FILE *output = fopen("output.c", "w");
+        if (output == NULL)
+        {
+                fprintf(stderr, "Failed to open output file\n");
+                exit(EXIT_FAILURE);
+        }
+        printf("Generated Code:\n");
+        fprintf(output, "#include<stdio.h>\n");
+        fprintf(output, "int main(){\n");
+        generate(root, output);
         fprintf(output, "return 0;\n}");
         fflush(output); // Ensure the data is written to disk
         fclose(output);
