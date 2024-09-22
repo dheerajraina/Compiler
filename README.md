@@ -2,12 +2,18 @@
 
 **Current Progress :-**
 
-int  age</br> 
-age := 60</br> 
+int  age</br>
+age := 60</br>
 print(age)
 
 int temp := 90 + 10</br>
 print(temp)
+
+
+for i from 0 to 10 {</br>
+        int number := 10</br>
+        print(number)</br>
+}
 
 
 
