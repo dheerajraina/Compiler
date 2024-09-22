@@ -145,7 +145,7 @@ void checkPrintStatement(Node *node)
 
 void checkForLoop(Node *node)
 {
-        if (node->numChildren != 1) // FOR LOOP NODE TO HAVE 2 CHILDREN -> DECLARED VARIABLE WITH ITS RANGE AS CHILDREN AND OTHER CONTAINING LOOP BODY
+        if (node->numChildren != 2) // FOR LOOP NODE TO HAVE 2 CHILDREN -> DECLARED VARIABLE WITH ITS RANGE AS CHILDREN AND OTHER CONTAINING LOOP BODY
         {
                 fprintf(stderr, "Error: Invalid for loop structure");
                 exit(EXIT_FAILURE);
