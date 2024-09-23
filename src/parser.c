@@ -256,7 +256,7 @@ Node *parseForLoop(Parser *parser)
                 // parser->pos++;
         }
 
-        if (parser->tokens[parser->pos].type != CLOSE_BRACE_TOKEN)
+        if (parser->tokens[parser->pos++].type != CLOSE_BRACE_TOKEN)
         {
                 printf("Syntax error: Unexpected token '%s'\n ", parser->tokens[parser->pos].value);
                 exit(EXIT_FAILURE);
