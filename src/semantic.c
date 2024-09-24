@@ -3,32 +3,78 @@
 #include <string.h>
 #include "semantic.h"
 
-static SymbolTable symbolTable;
+static ScopedSymbolTable scopedTable;
+
+SymbolTable createSymbolTable()
+{
+        SymbolTable symbolTable;
+        symbolTable.size = 0;
+        return symbolTable;
+}
+
+void printSymbolTable()
+{
+        for (int i = 0; i <= scopedTable.currentScope; i++)
+        {
+                printf("Scope %d:\n Size = %d", i, scopedTable.tables[i].size);
+                for (int j = 0; j < scopedTable.tables[i].size; j++)
+                {
+                        printf("  Name: %s, dType: %d\n",
+                               scopedTable.tables[i].symbols[j].name,
+                               scopedTable.tables[i].symbols[j].dType);
+                }
+        }
+}
+
+void enterNewScope()
+{
+        if (scopedTable.currentScope < scopedTable.maxScopes - 1)
+        {
+                scopedTable.currentScope++;
+                scopedTable.tables[scopedTable.currentScope] = createSymbolTable();
+        }
+}
+
+void exitScope()
+{
+        if (scopedTable.currentScope <= 0)
+        {
+                fprintf(stderr, "Symbol Table Error: No scope exists\n");
+                exit(EXIT_FAILURE);
+        }
+        scopedTable.currentScope--;
+}
 
 void addSymbol(const char *name, NodeType type, DataType dType)
 {
-        if (symbolTable.size >= SYMBOL_TABLE_SIZE)
+
+        if (scopedTable.tables[scopedTable.currentScope].size >= SYMBOL_TABLE_SIZE)
         {
                 fprintf(stderr, "Symbol table overflow: cannot add more symbols.\n");
                 exit(EXIT_FAILURE);
         }
 
-        strncpy(symbolTable.symbols[symbolTable.size].name, name, MAX_SYMBOL_NAME_LENGTH - 1);
-        symbolTable.symbols[symbolTable.size].name[MAX_SYMBOL_NAME_LENGTH - 1] = '\0'; // Ensure null-termination
-        symbolTable.symbols[symbolTable.size].type = type;
-        symbolTable.symbols[symbolTable.size].dType = dType;
-        symbolTable.size++;
+        strncpy(scopedTable.tables[scopedTable.currentScope].symbols[scopedTable.tables[scopedTable.currentScope].size].name, name, MAX_SYMBOL_NAME_LENGTH - 1);
+        scopedTable.tables[scopedTable.currentScope].symbols[scopedTable.tables[scopedTable.currentScope].size].name[MAX_SYMBOL_NAME_LENGTH - 1] = '\0'; // Ensure null-termination
+        scopedTable.tables[scopedTable.currentScope].symbols[scopedTable.tables[scopedTable.currentScope].size].type = type;
+        scopedTable.tables[scopedTable.currentScope].symbols[scopedTable.tables[scopedTable.currentScope].size].dType = dType;
+        scopedTable.tables[scopedTable.currentScope].size++;
 
         printf("Added symbol: %s with type: %d\n", name, type);
 }
 
 NodeType getSymbolType(const char *name)
 {
-        for (size_t i = 0; i < symbolTable.size; i++)
+        printf("get symbol type %d , name :%s\n", scopedTable.currentScope, name);
+        for (int i = scopedTable.currentScope; i >= 0; i--)
         {
-                if (strcmp(symbolTable.symbols[i].name, name) == 0)
+                SymbolTable currentSymbolTable = scopedTable.tables[i];
+                for (int j = 0; j < currentSymbolTable.size; j++)
                 {
-                        return symbolTable.symbols[i].dType;
+                        if (strcmp(currentSymbolTable.symbols[j].name, name) == 0)
+                        { // Fix indexing to j
+                                return currentSymbolTable.symbols[j].dType;
+                        }
                 }
         }
         return -1; // Indicates that the symbol is not found
@@ -36,41 +82,40 @@ NodeType getSymbolType(const char *name)
 
 void checkDeclaration(Node *node)
 {
-        printf("Checking declaration: %s\n", node->value);
+        printf("Checking declaration: %s , current scope: %d\n", node->value, scopedTable.currentScope);
         if (getSymbolType(node->value) != -1)
         {
                 printf("Semantic error: Redeclaration of variable '%s'\n", node->value);
                 exit(EXIT_FAILURE);
         }
-
         addSymbol(node->value, node->type, node->dType);
-        for (int i = 0; i < node->numChildren; i++)
-        {
-                analyzeNode(node->children[i]);
-        }
+        printSymbolTable();
 }
 
 void checkDeclarationAssignment(Node *node)
 {
-        printf("Checking declaration and assignment: %s\n", node->value);
+        printf("Checking declaration and assignment: %s,, current scope: %d\n", node->value, scopedTable.currentScope);
         if (getSymbolType(node->value) != -1)
         {
                 printf("Semantic error: Redeclaration of variable '%s'\n", node->value);
                 exit(EXIT_FAILURE);
         }
         addSymbol(node->value, node->children[0]->type, node->children[0]->dType);
-        for (int i = 0; i < node->numChildren; i++)
-        {
-                analyzeNode(node->children[i]);
-        }
-
         if (node->children[0]->type == BIN_OP_NODE)
+        {
                 checkBinaryOperation(node->children[0]);
-        else if (node->children[0]->type == LITERAL_NODE)
-                checkAssignment(node);
+        }
         else
-                exit(EXIT_FAILURE);
+        {
+                DataType valueType = node->children[0]->dType;
+                if (getSymbolType(node->value) != valueType)
+                {
+                        printf("Semantic error: Type mismatch in assignment to '%s'\n", node->value);
+                        exit(EXIT_FAILURE);
+                }
+        }
 }
+
 void checkAssignment(Node *node)
 {
         printf("Checking assignment to: %s\n", node->value);
@@ -79,11 +124,6 @@ void checkAssignment(Node *node)
         {
                 printf("Semantic error: Undeclared variable '%s'\n", node->value);
                 exit(EXIT_FAILURE);
-        }
-
-        for (int i = 0; i < node->numChildren; i++)
-        {
-                analyzeNode(node->children[i]);
         }
         if (node->children[0] != NULL)
         {
@@ -94,7 +134,6 @@ void checkAssignment(Node *node)
                 else
                 {
                         DataType valueType = node->children[0]->dType;
-                        printf("-----types %d %d ", varType, valueType);
                         if (varType != valueType)
                         {
                                 printf("Semantic error: Type mismatch in assignment to '%s'\n", node->value);
@@ -108,11 +147,10 @@ void checkBinaryOperation(Node *node)
 {
         if (strcmp(node->value, "+") == 0)
         {
-
                 analyzeNode(node->children[0]);
                 analyzeNode(node->children[1]);
-                TokenType leftType = getSymbolType(node->children[0]->value);
-                TokenType rightType = getSymbolType(node->children[1]->value);
+                DataType leftType = getSymbolType(node->children[0]->value);
+                DataType rightType = getSymbolType(node->children[1]->value);
 
                 if (node->children[0]->type == LITERAL_NODE)
                 {
@@ -131,11 +169,11 @@ void checkBinaryOperation(Node *node)
                 }
         }
 }
+
 void checkPrintStatement(Node *node)
 {
         printf("Checking print statement for variable: %s\n", node->children[0]->value);
-        NodeType varType = getSymbolType(node->children[0]->value);
-        printf(" print node %s  %d\n", node->children[0]->value, node->children[0]->type);
+        DataType varType = getSymbolType(node->children[0]->value);
         if (varType == -1)
         {
                 printf("Semantic error: Undeclared variable '%s'\n", node->children[0]->value);
@@ -145,15 +183,17 @@ void checkPrintStatement(Node *node)
 
 void checkForLoop(Node *node)
 {
-        if (node->numChildren != 2) // FOR LOOP NODE TO HAVE 2 CHILDREN -> DECLARED VARIABLE WITH ITS RANGE AS CHILDREN AND OTHER CONTAINING LOOP BODY
+        enterNewScope(); // Enter new scope for the for loop
+        if (node->numChildren != 2)
         {
-                fprintf(stderr, "Error: Invalid for loop structure");
+                fprintf(stderr, "Error: Invalid for loop structure\n");
                 exit(EXIT_FAILURE);
         }
         Node *initNode = node->children[0]; // variable declaration
+        checkDeclaration(initNode);
         if (initNode->numChildren != 2)
         {
-                fprintf(stderr, "Error: Invalid for loop structure");
+                fprintf(stderr, "Error: Invalid for loop structure\n");
                 exit(EXIT_FAILURE);
         }
         Node *fromExpr = initNode->children[0];
@@ -161,16 +201,19 @@ void checkForLoop(Node *node)
 
         if (initNode->dType != fromExpr->dType || initNode->dType != toExpr->dType)
         {
-                fprintf(stderr, "Semantic error: Type mismatch in assignment to '%s in for loop'\n", initNode->value);
+                fprintf(stderr, "Semantic error: Type mismatch in for loop variable '%s'\n", initNode->value);
                 exit(EXIT_FAILURE);
         }
+
+        analyzeNode(node->children[1]); // Analyze loop body
+        printSymbolTable();
+        exitScope(); // Exit scope after the loop
 }
 
 void analyzeNode(Node *node)
 {
         if (node == NULL)
                 return;
-
         switch (node->type)
         {
         case DECLARATION_NODE:
@@ -180,7 +223,6 @@ void analyzeNode(Node *node)
                 checkAssignment(node);
                 break;
         case PRINT_STATEMENT_NODE:
-
                 checkPrintStatement(node);
                 break;
         case BIN_OP_NODE:
@@ -191,7 +233,7 @@ void analyzeNode(Node *node)
                 break;
         case FOR_LOOP_NODE:
                 checkForLoop(node);
-                break;
+                return;
         default:
                 break;
         }
@@ -207,6 +249,9 @@ void analyzeNode(Node *node)
 
 void analyze(Node *root)
 {
-        symbolTable.size = 0;
+        scopedTable.currentScope = -1;
+        scopedTable.maxScopes = 10;
+        scopedTable.tables = malloc(scopedTable.maxScopes * sizeof(SymbolTable));
+        enterNewScope(); // Starting new root parse table
         analyzeNode(root);
 }
