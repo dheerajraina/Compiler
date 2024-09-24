@@ -19,6 +19,16 @@ int number</br>
 number := 90</br>
 print(number)</br>
 
+### Features
+- Datatype (int)
+- Variable declaration
+- Value assignment to declared variable(during declaration or separately)
+- Printing declared and initialized variable
+- Loop (for-loop)
+- Variable Scoping
+
+
+
 
 
 
