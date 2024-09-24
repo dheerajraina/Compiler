@@ -24,13 +24,9 @@ print(number)</br>
 - Variable declaration
 - Value assignment to declared variable(during declaration or separately)
 - Printing declared and initialized variable
+- Binary operation (sum)
 - Loop (for-loop)
 - Variable Scoping
-
-
-
-
-
 
 ### Project setup (Ubuntu)
 - Clone and enter the repository directory
