@@ -15,6 +15,10 @@ for i from 0 to 10 {</br>
         print(number)</br>
 }
 
+int number</br>
+number := 90</br>
+print(number)</br>
+
 
 
 
