@@ -73,6 +73,7 @@ TokenList tokenize(const char *source)
                 }
                 else
                 {
+                        // printf("----------current token %s", ptr);
                         switch (*ptr)
                         {
                         case ':':
@@ -104,7 +105,19 @@ TokenList tokenize(const char *source)
                         case '+':
                                 addToken(&list, PLUS_TOKEN, "+");
                                 break;
-
+                        case '>':
+                                addToken(&list, GREATER_THAN_TOKEN, ">");
+                                break;
+                        case '<':
+                                addToken(&list, LESS_THAN_TOKEN, "<");
+                                break;
+                        case '=':
+                                if (*(ptr + 1) == '=')
+                                {
+                                        addToken(&list, EQUAL_TO_TOKEN, "==");
+                                        ptr++;
+                                }
+                                break;
                         default:
                                 ptr++;
                                 break;

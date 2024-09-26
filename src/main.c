@@ -68,6 +68,12 @@ const char *tokenTypeToString(TokenType type)
                 return "OPEN_BRACE";
         case CLOSE_BRACE_TOKEN:
                 return "CLOSE_BRACE";
+        case GREATER_THAN_TOKEN:
+                return "GREATER_THAN_TOKEN";
+        case LESS_THAN_TOKEN:
+                return "LESS_THAN_TOKEN";
+        case EQUAL_TO_TOKEN:
+                return "EQUAL_TO_TOKEN";
         case END_OF_FILE_TOKEN:
                 return "END_OF_FILE";
         default:
@@ -107,15 +113,15 @@ int main()
         printf("Tokens:\n");
         printTokens(tokens);
 
-        Node *syntaxTree = parse(&tokens);
-        printf("\nAbstract Syntax Tree:\n");
-        printAST(syntaxTree, 0);
+        // Node *syntaxTree = parse(&tokens);
+        // printf("\nAbstract Syntax Tree:\n");
+        // printAST(syntaxTree, 0);
 
-        analyze(syntaxTree);
-        codeGenerator(syntaxTree);
-        printf("\n\n\n\n");
-        printf("Final Source Code Run\n");
-        run();
+        // analyze(syntaxTree);
+        // codeGenerator(syntaxTree);
+        // printf("\n\n\n\n");
+        // printf("Final Source Code Run\n");
+        // run();
 
         return EXIT_SUCCESS;
 }
