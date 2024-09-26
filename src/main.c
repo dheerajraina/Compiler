@@ -74,6 +74,12 @@ const char *tokenTypeToString(TokenType type)
                 return "LESS_THAN_TOKEN";
         case EQUAL_TO_TOKEN:
                 return "EQUAL_TO_TOKEN";
+        case IF_KEYWORD:
+                return "IF_KEYWORD";
+        case ELIF_KEYWORD:
+                return "ELIF_KEYWORD";
+        case ELSE_KEYWORD:
+                return "ELSE_KEYWORD";
         case END_OF_FILE_TOKEN:
                 return "END_OF_FILE";
         default:

@@ -65,6 +65,18 @@ TokenList tokenize(const char *source)
                         {
                                 addToken(&list, TO_KEYWORD, word);
                         }
+                        else if (strcmp(word, "if") == 0)
+                        {
+                                addToken(&list, IF_KEYWORD, word);
+                        }
+                        else if (strcmp(word, "elif") == 0)
+                        {
+                                addToken(&list, ELIF_KEYWORD, word);
+                        }
+                        else if (strcmp(word, "else") == 0)
+                        {
+                                addToken(&list, ELSE_KEYWORD, word);
+                        }
                         else
                         {
                                 addToken(&list, IDENTIFIER_TOKEN, word);
