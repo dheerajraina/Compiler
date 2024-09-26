@@ -56,6 +56,7 @@ Node *parseDeclaration(Parser *parser);
 Node *parseAssignment(Parser *parser);
 Node *parsePrintStatement(Parser *parser);
 Node *parseForLoop(Parser *parser);
+Node *parseIfStatement(Parser *parser);
 
 Node *parseToken(Parser *parser)
 {
@@ -83,6 +84,11 @@ Node *parseToken(Parser *parser)
                 {
                         printf("-----------FOR KEYWORD");
                         return parseForLoop(parser);
+                }
+                else if (token.type == IF_KEYWORD)
+                {
+                        printf("-----------------IF KEYWORD");
+                        return parseIfStatement(parser);
                 }
         }
         return NULL;
@@ -269,6 +275,67 @@ Node *parseForLoop(Parser *parser)
         return forNode;
 }
 
+Node *parseIfStatement(Parser *parser)
+{
+        Node *ifNode = createNode(IF_STATEMENT_NODE, "if", NONE);
+        parser->pos++;
+        if (parser->tokens[parser->pos++].type != LPAREN_TOKEN || (parser->tokens[parser->pos].type != IDENTIFIER_TOKEN && parser->tokens[parser->pos].type != LITERAL_INT_TOKEN))
+        {
+                printf("Syntax error: Unexpected token '%s'\n ", parser->tokens[parser->pos].value);
+                exit(EXIT_FAILURE);
+        }
+        Node *left = parser->tokens[parser->pos].type == LITERAL_INT_TOKEN ? createNode(LITERAL_NODE, parser->tokens[parser->pos].value, INT) : createNode(IDENTIFIER_NODE, parser->tokens[parser->pos++].value, INT);
+        if (parser->tokens[parser->pos].type != EQUAL_TO_TOKEN && parser->tokens[parser->pos].type != LESS_THAN_TOKEN && parser->tokens[parser->pos].type != GREATER_THAN_TOKEN)
+        {
+                printf("Syntax error: Unexpected token '%s ; Comparison operator expected'\n ", parser->tokens[parser->pos].value);
+                exit(EXIT_FAILURE);
+        }
+        Node *bin_op_node = createNode(BIN_OP_NODE, parser->tokens[parser->pos].value, NONE);
+        parser->pos++;
+
+        if (parser->tokens[parser->pos].type != IDENTIFIER_TOKEN && parser->tokens[parser->pos].type != LITERAL_INT_TOKEN)
+        {
+                printf("Syntax error: Unexpected token '%s'\n ", parser->tokens[parser->pos].value);
+                exit(EXIT_FAILURE);
+        }
+        parser->pos++;
+        if (parser->tokens[parser->pos].type != RPAREN_TOKEN)
+        {
+                printf("Syntax error: Unexpected token '%s'\n ", parser->tokens[parser->pos].value);
+                exit(EXIT_FAILURE);
+        }
+        parser->pos--;
+        Node *testNode = createNode(CONDITIONAL_TEST_NODE, "test", NONE);
+        Node *right = parser->tokens[parser->pos].type == LITERAL_INT_TOKEN ? createNode(LITERAL_NODE, parser->tokens[parser->pos].value, INT) : createNode(IDENTIFIER_NODE, parser->tokens[parser->pos++].value, INT);
+        addChild(ifNode, testNode);
+        addChild(testNode, bin_op_node);
+        addChild(bin_op_node, left);
+        addChild(bin_op_node, right);
+
+        parser->pos++;
+        Node *conditionalBody = createNode(CONDITIONAL_BODY_NODE, "body", NONE);
+        if (parser->tokens[parser->pos++].type != OPEN_BRACE_TOKEN)
+        {
+                printf("Syntax error: Unexpected token '%s'\n ", parser->tokens[parser->pos].value);
+                exit(EXIT_FAILURE);
+        }
+        while (parser->tokens[parser->pos].type != CLOSE_BRACE_TOKEN)
+        {
+                addChild(conditionalBody, parseToken(parser));
+        }
+
+        if (parser->tokens[parser->pos++].type != CLOSE_BRACE_TOKEN)
+        {
+                printf("Syntax error: Unexpected token '%s'\n ", parser->tokens[parser->pos].value);
+                exit(EXIT_FAILURE);
+        }
+        if (conditionalBody)
+        {
+                addChild(ifNode, conditionalBody);
+        }
+
+        return ifNode;
+}
 Node *parse(TokenList *tokenList)
 {
         Parser parser;
