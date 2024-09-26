@@ -23,7 +23,11 @@ typedef enum
         FROM_EXPR_NODE,
         TO_EXPR_NODE,
         LOOP_BODY_NODE,
-
+        IF_STATEMENT_NODE,
+        ELIF_CLAUSE_NODE,
+        ELSE_CLAUSE_NODE,
+        CONDITIONAL_TEST_NODE,
+        CONDITIONAL_BODY_NODE,
 } NodeType;
 
 typedef struct Node
