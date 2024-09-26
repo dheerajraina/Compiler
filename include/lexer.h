@@ -21,6 +21,9 @@ typedef enum
         GREATER_THAN_TOKEN,
         LESS_THAN_TOKEN,
         EQUAL_TO_TOKEN,
+        IF_KEYWORD,
+        ELIF_KEYWORD,
+        ELSE_KEYWORD,
         END_OF_FILE_TOKEN,
 } TokenType;
 
