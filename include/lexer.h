@@ -18,6 +18,9 @@ typedef enum
         TO_KEYWORD,
         OPEN_BRACE_TOKEN,  // {
         CLOSE_BRACE_TOKEN, // }
+        GREATER_THAN_TOKEN,
+        LESS_THAN_TOKEN,
+        EQUAL_TO_TOKEN,
         END_OF_FILE_TOKEN,
 } TokenType;
 
