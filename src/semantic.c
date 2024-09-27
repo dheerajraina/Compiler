@@ -145,21 +145,37 @@ void checkAssignment(Node *node)
 
 void checkBinaryOperation(Node *node)
 {
-        if (strcmp(node->value, "+") == 0)
+        if (strcmp(node->value, "+") == 0 || strcmp(node->value, ">") == 0 || strcmp(node->value, "<") == 0 || strcmp(node->value, "==") == 0)
         {
                 analyzeNode(node->children[0]);
                 analyzeNode(node->children[1]);
                 DataType leftType = getSymbolType(node->children[0]->value);
                 DataType rightType = getSymbolType(node->children[1]->value);
 
-                if (node->children[0]->type == LITERAL_NODE)
+                if (node->children[0]->type == LITERAL_NODE || node->children[0]->type == IDENTIFIER_NODE)
                 {
-                        leftType = LITERAL_INT_TOKEN; // Assuming literals are integers for simplicity
+                        if (node->children[0]->type == IDENTIFIER_NODE)
+                        {
+                                if (getSymbolType(node->children[0]->value) == -1)
+                                {
+                                        printf("Semantic error: Variable '%s' referenced before declaration\n", node->children[0]->value);
+                                        exit(EXIT_FAILURE);
+                                }
+                        }
+                        leftType = node->children[0]->dType; // Assuming literals are integers for simplicity
                 }
 
-                if (node->children[1]->type == LITERAL_NODE)
+                if (node->children[1]->type == LITERAL_NODE || node->children[1]->type == IDENTIFIER_NODE)
                 {
-                        rightType = LITERAL_INT_TOKEN; // Assuming literals are integers for simplicity
+                        if (node->children[1]->type == IDENTIFIER_NODE)
+                        {
+                                if (getSymbolType(node->children[1]->value) == -1)
+                                {
+                                        printf("Semantic error: Variable '%s' referenced before declaration\n", node->children[1]->value);
+                                        exit(EXIT_FAILURE);
+                                }
+                        }
+                        rightType = node->children[1]->dType; // Assuming literals are integers for simplicity
                 }
 
                 if (leftType != rightType)
@@ -210,6 +226,27 @@ void checkForLoop(Node *node)
         exitScope(); // Exit scope after the loop
 }
 
+void checkIfStatement(Node *node)
+{
+        enterNewScope();
+        if (node->numChildren != 2)
+        {
+                fprintf(stderr, "Error: Invalid if statement structure\n");
+                exit(EXIT_FAILURE);
+        }
+        Node *testNode = node->children[0];
+        Node *bodyNode = node->children[1];
+        if (testNode->numChildren != 1)
+        {
+                fprintf(stderr, "Error: Invalid if statement structure\n");
+                exit(EXIT_FAILURE);
+        }
+        checkBinaryOperation(testNode->children[0]);
+        analyzeNode(bodyNode);
+        printSymbolTable();
+        exitScope();
+}
+
 void analyzeNode(Node *node)
 {
         if (node == NULL)
@@ -234,6 +271,10 @@ void analyzeNode(Node *node)
         case FOR_LOOP_NODE:
                 checkForLoop(node);
                 return;
+        case IF_STATEMENT_NODE:
+                printf("IF STATEMENT NODE\n");
+                checkIfStatement(node);
+                break;
         default:
                 break;
         }
