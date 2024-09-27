@@ -65,6 +65,16 @@ void generate(Node *root, FILE *output)
                         generate(loopBody, output);
                         fprintf(output, "}");
                 }
+                else if (child->type == IF_STATEMENT_NODE)
+                {
+                        Node *test = child->children[0];
+                        Node *binOpNode = test->children[0];
+                        Node *ifBody = child->children[1];
+                        printf("------test node %s", binOpNode->value);
+                        fprintf(output, "if(%s %s %s){", binOpNode->children[0]->value, binOpNode->value, binOpNode->children[1]->value);
+                        generate(ifBody, output);
+                        fprintf(output, "}");
+                }
         }
 }
 
