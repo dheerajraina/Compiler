@@ -74,6 +74,17 @@ void generate(Node *root, FILE *output)
                         fprintf(output, "if(%s %s %s){", binOpNode->children[0]->value, binOpNode->value, binOpNode->children[1]->value);
                         generate(ifBody, output);
                         fprintf(output, "}");
+
+                        if (child->numChildren == 3)
+                        {
+                                if (child->children[2]->type == ELSE_CLAUSE_NODE)
+                                {
+                                        Node *body = child->children[2]->children[0];
+                                        fprintf(output, "else{");
+                                        generate(body, output);
+                                        fprintf(output, "}");
+                                }
+                        }
                 }
         }
 }
