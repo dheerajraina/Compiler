@@ -333,6 +333,34 @@ Node *parseIfStatement(Parser *parser)
         {
                 addChild(ifNode, conditionalBody);
         }
+        if (parser->tokens[parser->pos++].type == ELSE_KEYWORD)
+        {
+                Node *elseNode = createNode(ELSE_CLAUSE_NODE, "else", NONE);
+                Node *elseBody = createNode(CONDITIONAL_BODY_NODE, "body", NONE);
+
+                if (parser->tokens[parser->pos++].type != OPEN_BRACE_TOKEN)
+                {
+                        printf("Syntax error: Unexpected token '%s'\n ", parser->tokens[parser->pos].value);
+                        exit(EXIT_FAILURE);
+                }
+                while (parser->tokens[parser->pos].type != CLOSE_BRACE_TOKEN)
+                {
+                        addChild(elseBody, parseToken(parser));
+                }
+
+                if (parser->tokens[parser->pos].type != CLOSE_BRACE_TOKEN)
+                {
+                        printf("Syntax error: Unexpected token '%s'\n ", parser->tokens[parser->pos].value);
+                        exit(EXIT_FAILURE);
+                }
+                if (elseBody)
+                {
+                        addChild(elseNode, elseBody);
+                        addChild(ifNode, elseNode);
+                        printf("--------parser after else %s", parser->tokens[parser->pos].value);
+                }
+        }
+        parser->pos++;
 
         return ifNode;
 }
