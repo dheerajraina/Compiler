@@ -229,7 +229,7 @@ void checkForLoop(Node *node)
 void checkIfStatement(Node *node)
 {
         enterNewScope();
-        if (node->numChildren != 2)
+        if (node->numChildren < 2)
         {
                 fprintf(stderr, "Error: Invalid if statement structure\n");
                 exit(EXIT_FAILURE);
@@ -243,6 +243,15 @@ void checkIfStatement(Node *node)
         }
         checkBinaryOperation(testNode->children[0]);
         analyzeNode(bodyNode);
+        if (node->numChildren == 3)
+        {
+                if (node->children[2]->type == ELSE_CLAUSE_NODE)
+                {
+                        printf("---------_Else clause node");
+                        Node *elseNode = node->children[2];
+                        analyzeNode(elseNode);
+                }
+        }
         printSymbolTable();
         exitScope();
 }
