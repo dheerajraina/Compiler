@@ -333,8 +333,9 @@ Node *parseIfStatement(Parser *parser)
         {
                 addChild(ifNode, conditionalBody);
         }
-        if (parser->tokens[parser->pos++].type == ELSE_KEYWORD)
+        if (parser->tokens[parser->pos].type == ELSE_KEYWORD)
         {
+                parser->pos++;
                 Node *elseNode = createNode(ELSE_CLAUSE_NODE, "else", NONE);
                 Node *elseBody = createNode(CONDITIONAL_BODY_NODE, "body", NONE);
 
@@ -359,8 +360,8 @@ Node *parseIfStatement(Parser *parser)
                         addChild(ifNode, elseNode);
                         printf("--------parser after else %s", parser->tokens[parser->pos].value);
                 }
+                parser->pos++;
         }
-        parser->pos++;
 
         return ifNode;
 }
