@@ -277,7 +277,7 @@ Node *parseForLoop(Parser *parser)
 
 Node *parseIfStatement(Parser *parser)
 {
-        Node *ifNode = createNode(IF_STATEMENT_NODE, "if", NONE);
+        Node *ifNode = parser->tokens[parser->pos].type == IF_KEYWORD ? createNode(IF_STATEMENT_NODE, "if", NONE) : createNode(ELIF_CLAUSE_NODE, "elif", NONE);
         parser->pos++;
         if (parser->tokens[parser->pos++].type != LPAREN_TOKEN || (parser->tokens[parser->pos].type != IDENTIFIER_TOKEN && parser->tokens[parser->pos].type != LITERAL_INT_TOKEN))
         {
@@ -333,7 +333,11 @@ Node *parseIfStatement(Parser *parser)
         {
                 addChild(ifNode, conditionalBody);
         }
-        if (parser->tokens[parser->pos].type == ELSE_KEYWORD)
+        if (parser->tokens[parser->pos].type == ELIF_KEYWORD)
+        {
+                addChild(ifNode, parseIfStatement(parser));
+        }
+        else if (parser->tokens[parser->pos].type == ELSE_KEYWORD)
         {
                 parser->pos++;
                 Node *elseNode = createNode(ELSE_CLAUSE_NODE, "else", NONE);
