@@ -226,33 +226,56 @@ void checkForLoop(Node *node)
         exitScope(); // Exit scope after the loop
 }
 
-void checkIfStatement(Node *node)
+void processConditonals(Node *node)
 {
-        enterNewScope();
         if (node->numChildren < 2)
         {
+                printf("::::::::::::::here1 %s", node->value);
+
                 fprintf(stderr, "Error: Invalid if statement structure\n");
                 exit(EXIT_FAILURE);
         }
+
         Node *testNode = node->children[0];
         Node *bodyNode = node->children[1];
+
         if (testNode->numChildren != 1)
         {
+                printf("::::::::::::::here");
                 fprintf(stderr, "Error: Invalid if statement structure\n");
                 exit(EXIT_FAILURE);
         }
         checkBinaryOperation(testNode->children[0]);
         analyzeNode(bodyNode);
+        printSymbolTable();
+}
+
+void checkIfStatement(Node *node)
+{
+        enterNewScope();
+        processConditonals(node);
+        exitScope();
+}
+
+void checkElifStatement(Node *node)
+{
+        printf("---------_Elif clause node");
+        enterNewScope();
+        processConditonals(node);
+        exitScope();
+}
+
+void checkElseStatement(Node *node)
+{
+        enterNewScope();
+        printf("---------_Else clause node");
         if (node->numChildren == 3)
         {
-                if (node->children[2]->type == ELSE_CLAUSE_NODE)
-                {
-                        printf("---------_Else clause node");
-                        Node *elseNode = node->children[2];
-                        analyzeNode(elseNode);
-                }
+                Node *elseNode = node->children[2];
+                analyzeNode(elseNode);
+                printSymbolTable();
         }
-        printSymbolTable();
+
         exitScope();
 }
 
@@ -279,10 +302,18 @@ void analyzeNode(Node *node)
                 break;
         case FOR_LOOP_NODE:
                 checkForLoop(node);
-                return;
+                break;
         case IF_STATEMENT_NODE:
                 printf("IF STATEMENT NODE\n");
                 checkIfStatement(node);
+                break;
+        case ELIF_CLAUSE_NODE:
+                printf("ELIF STATEMENT NODE\n");
+                checkElifStatement(node);
+                break;
+        case ELSE_CLAUSE_NODE:
+                printf("ELSE STATEMENT NODE\n");
+                checkElseStatement(node);
                 break;
         default:
                 break;
