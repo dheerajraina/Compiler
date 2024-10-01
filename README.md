@@ -19,6 +19,16 @@ int number</br>
 number := 90</br>
 print(number)</br>
 
+if (number>age){</br>
+        print(number)</br>
+}</br>
+elif(age>number){</br>
+        print(age)</br>
+}</br>
+else{</br>
+        print(temp)</br>
+}</br>
+
 ### Features
 - Datatype (int)
 - Variable declaration
@@ -27,6 +37,7 @@ print(number)</br>
 - Binary operation (sum)
 - Loop (for-loop)
 - Variable Scoping
+- if-elif-else conditionals
 
 ### Project setup (Ubuntu)
 - Clone and enter the repository directory
