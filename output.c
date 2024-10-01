@@ -11,5 +11,8 @@ printf("%d\n", number);
 }int number;
 number = 90;
 printf("%d\n", number);
-return 0;
+if(number > age){printf("%d\n", number);
+}else if(age > number){printf("%d\n", age);
+}else{printf("%d\n", temp);
+}return 0;
 }
