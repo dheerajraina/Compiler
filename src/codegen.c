@@ -3,10 +3,38 @@
 #include <string.h>
 #include "codegen.h"
 
+void writeIfConditional(Node *node, FILE *output)
+{
+        Node *test = node->children[0];
+        Node *binOpNode = test->children[0];
+        Node *ifBody = node->children[1];
+        printf("------test node %s", binOpNode->value);
+        char *if_elif = node->type == IF_STATEMENT_NODE ? "if" : "else if";
+        fprintf(output, "%s(%s %s %s){", if_elif, binOpNode->children[0]->value, binOpNode->value, binOpNode->children[1]->value);
+        generate(ifBody, output);
+        fprintf(output, "}");
+
+        if (node->numChildren == 3)
+        {
+                if (node->children[2]->type == ELIF_CLAUSE_NODE)
+                {
+                        printf("ELIF generate");
+                        writeIfConditional(node->children[2], output);
+                }
+                else if (node->children[2]->type == ELSE_CLAUSE_NODE)
+                {
+                        Node *body = node->children[2]->children[0];
+                        fprintf(output, "else{");
+                        generate(body, output);
+                        fprintf(output, "}");
+                }
+        }
+}
+
 void generate(Node *root, FILE *output)
 {
 
-        for (int i = 0; i < root->numChildren && root->children[i] != NULL; i++)
+        for (int i = 0; i < root->numChildren; i++)
         {
                 Node *child = root->children[i];
                 if (child == NULL)
@@ -67,24 +95,7 @@ void generate(Node *root, FILE *output)
                 }
                 else if (child->type == IF_STATEMENT_NODE)
                 {
-                        Node *test = child->children[0];
-                        Node *binOpNode = test->children[0];
-                        Node *ifBody = child->children[1];
-                        printf("------test node %s", binOpNode->value);
-                        fprintf(output, "if(%s %s %s){", binOpNode->children[0]->value, binOpNode->value, binOpNode->children[1]->value);
-                        generate(ifBody, output);
-                        fprintf(output, "}");
-
-                        if (child->numChildren == 3)
-                        {
-                                if (child->children[2]->type == ELSE_CLAUSE_NODE)
-                                {
-                                        Node *body = child->children[2]->children[0];
-                                        fprintf(output, "else{");
-                                        generate(body, output);
-                                        fprintf(output, "}");
-                                }
-                        }
+                        writeIfConditional(child, output);
                 }
         }
 }
