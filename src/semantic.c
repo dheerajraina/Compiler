@@ -226,7 +226,7 @@ void checkForLoop(Node *node)
         exitScope(); // Exit scope after the loop
 }
 
-void processConditonals(Node *node)
+void processConditionals(Node *node)
 {
         if (node->numChildren < 2)
         {
@@ -302,7 +302,7 @@ void analyzeNode(Node *node)
                 break;
         case FOR_LOOP_NODE:
                 checkForLoop(node);
-                break;
+                return;
         case IF_STATEMENT_NODE:
                 printf("IF STATEMENT NODE\n");
                 checkIfStatement(node);
