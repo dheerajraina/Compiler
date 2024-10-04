@@ -253,7 +253,7 @@ void processConditionals(Node *node)
 void checkIfStatement(Node *node)
 {
         enterNewScope();
-        processConditonals(node);
+        processConditionals(node);
         exitScope();
 }
 
@@ -261,7 +261,7 @@ void checkElifStatement(Node *node)
 {
         printf("---------_Elif clause node");
         enterNewScope();
-        processConditonals(node);
+        processConditionals(node);
         exitScope();
 }
 
